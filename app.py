@@ -5,14 +5,6 @@ import joblib
 # Load trained model
 model = joblib.load("term_deposit_model.pkl")
 
-
-
-emp_var_rate = st.number_input("Employment Variation Rate (emp.var.rate)", value=1.0)
-cons_price_idx = st.number_input("Consumer Price Index (cons.price.idx)", value=93.2)
-cons_conf_idx = st.number_input("Consumer Confidence Index (cons.conf.idx)", value=-40.0)
-euribor3m = st.number_input("3-Month Euribor Rate (euribor3m)", value=0.5)
-nr_employed = st.number_input("Number of Employees (nr.employed)", value=5000.0)
-
 # Mappings (these must match the ones used during model training)
 job_map = {'admin.': 0, 'blue-collar': 1, 'entrepreneur': 2, 'housemaid': 3,
            'management': 4, 'retired': 5, 'self-employed': 6, 'services': 7,
@@ -47,8 +39,13 @@ campaign = st.number_input("Number of Contacts During Campaign", 1, 50, 1)
 pdays = st.number_input("Days Since Last Contact", 0, 999, 999)
 previous = st.number_input("Number of Previous Contacts", 0, 50, 0)
 
+emp_var_rate = st.number_input("emp.var.rate", value=1.0)
+cons_price_idx = st.number_input("cons.price.idx", value=93.2)
+cons_conf_idx = st.number_input("cons.conf.idx", value=-40.0)
+euribor3m = st.number_input("euribor3m", value=0.5)
+nr_employed = st.number_input("nr.employed", value=5000.0)
 
-# Internally calculate age group (not shown on app)
+# calculate age group
 def get_age_group(age):
     if age < 26:
         return "18-25"
@@ -101,6 +98,6 @@ if st.button("Predict"):
 
     # Make prediction
     prediction = model.predict(features.reshape(1, -1))
-    result = "Subscribed ✅" if prediction[0] == 1 else "Not Subscribed"
+    result = "Subscribed ✅" if prediction[0] == 1 else "❌ Not Subscribed"
     st.success(f"Prediction: {result}")
 
