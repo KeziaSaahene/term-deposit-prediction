@@ -5,6 +5,14 @@ import joblib
 # Load trained model
 model = joblib.load("term_deposit_model.pkl")
 
+
+
+emp_var_rate = st.number_input("Employment Variation Rate (emp.var.rate)", value=1.0)
+cons_price_idx = st.number_input("Consumer Price Index (cons.price.idx)", value=93.2)
+cons_conf_idx = st.number_input("Consumer Confidence Index (cons.conf.idx)", value=-40.0)
+euribor3m = st.number_input("3-Month Euribor Rate (euribor3m)", value=0.5)
+nr_employed = st.number_input("Number of Employees (nr.employed)", value=5000.0)
+
 # Mappings (these must match the ones used during model training)
 job_map = {'admin.': 0, 'blue-collar': 1, 'entrepreneur': 2, 'housemaid': 3,
            'management': 4, 'retired': 5, 'self-employed': 6, 'services': 7,
@@ -39,7 +47,34 @@ campaign = st.number_input("Number of Contacts During Campaign", 1, 50, 1)
 pdays = st.number_input("Days Since Last Contact", 0, 999, 999)
 previous = st.number_input("Number of Previous Contacts", 0, 50, 0)
 
-# Button
+
+# Internally calculate age group (not shown on app)
+def get_age_group(age):
+    if age < 26:
+        return "18-25"
+    elif age < 36:
+        return "26-35"
+    elif age < 46:
+        return "36-45"
+    elif age < 56:
+        return "46-55"
+    elif age < 66:
+        return "56-65"
+    else:
+        return "66+"
+
+age_group_map = {
+    "18-25": 0,
+    "26-35": 1,
+    "36-45": 2,
+    "46-55": 3,
+    "56-65": 4,
+    "66+": 5
+}
+age_group = get_age_group(age)
+age_group_encoded = age_group_map[age_group]
+
+# Prediction button
 if st.button("Predict"):
     # Encode categorical variables
     features = np.array([
@@ -55,10 +90,17 @@ if st.button("Predict"):
         contact_map[contact],
         month_map[month],
         day_map[day_of_week],
-        poutcome_map[poutcome]
+        poutcome_map[poutcome],
+        emp_var_rate,
+        cons_price_idx,
+        cons_conf_idx,
+        euribor3m,
+        nr_employed, age_group_encoded  
     ])
+
 
     # Make prediction
     prediction = model.predict(features.reshape(1, -1))
-    result = "Subscribed ✅" if prediction[0] == 1 else "Not Subscribed ❌"
+    result = "Subscribed ✅" if prediction[0] == 1 else "Not Subscribed"
     st.success(f"Prediction: {result}")
+
