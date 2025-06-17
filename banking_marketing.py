@@ -10,6 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
+# data loading
 data = pd.read_csv('bank-additional-full.csv', sep= ';') 
 
 # making a copy of data dataframe
@@ -84,6 +85,12 @@ print(df.describe())
 df['age_group'] = pd.cut(df['age'],
                          bins=[0, 24, 34, 44, 54, 64, 100],
                          labels=['Young', 'Young Adult', 'Adult', 'Middle-aged', 'Senior', 'Retired'])
+
+# exploring subscription count 
+plt.figure(figsize=(8,5))
+sns.countplot(x='y',hue='y', data=df)
+plt.title("Subscription distribution")
+plt.show()
 
 # plotting features by the target
 # plotting subscription count by age group
@@ -230,8 +237,6 @@ print("ROC AUC Score:", roc_auc_score(y_test, log_reg.predict_proba(X_test)[:, 1
 # training Random Forest model
 model = RandomForestClassifier(n_estimators = 100, random_state=42, class_weight= 'balanced')
 model.fit(X_train, y_train)
-
-
 
 # evaluating the Random Forest model
 y_pred = model.predict(X_test)
